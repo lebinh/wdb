@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import urllib2
+import random
 from optparse import OptionParser
 from BeautifulSoup import BeautifulSoup
 from WordsDB import WordsDB
@@ -51,12 +52,28 @@ def add_to_db(word, dic):
       print 'Cannot find the definition of "%s". Skipped.' % word
 
 
+def quiz(dic):
+  words = dic.all()
+  dic.close()
+  cont = True
+  while cont:
+    word, df = words[random.randrange(len(words))]
+    print '\n', df
+    ans = raw_input('\nWhat word has the above meaning? ')
+    if ans.lower() == word.lower():
+      print 'Correct! Well done.'
+    else:
+      print 'Wrong! It\'s %s.' % word
+    cont = raw_input('Continue? (y/n): ').lower() == 'y'
+
+
 def main():
   usage = 'usage: %prog [options] action [words]\n\n'
-  usage += 'Supported actions: list, add, delete\n'
+  usage += 'Supported actions:\n'
   usage += '  list \t\t list all words in database\n'
   usage += '  add \t\t add words into database\n'
-  usage += '  delete \t remove words from database'
+  usage += '  delete \t remove words from database\n'
+  usage += '  quiz \t\t test your vocabulary with a simple quiz'
   parser= OptionParser(usage)
   parser.add_option('-v', '--verbose', action='store_true', dest='verbose', default=False, help='verbose output')
   opt, args = parser.parse_args()
@@ -84,6 +101,8 @@ def main():
   elif action == 'delete':
     dic.delete_all(args[1:])
     dic.close()
+  elif action == 'quiz':
+    quiz(dic)
   else:
     print 'Unknown action: %s' %action
     parser.print_usage()
